@@ -150,6 +150,12 @@ JSON schema is committed to be **additive across versions** (see
 [docs/json-schema.md](docs/json-schema.md) for the stability promise);
 everything else may shift before v1.
 
-## 🌟 Star History
-[![Star History Chart](https://api.star-history.com/chart?repos=kypkk/acode&type=date&legend=bottom-right)](https://www.star-history.com/?repos=kypkk/acode&type=date&legend=bottom-right)
+## Star History
 
+<a href="https://www.star-history.com/?repos=kypkk%2Facode&type=date&legend=bottom-right">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=kypkk/acode&type=date&theme=dark&legend=bottom-right" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=kypkk/acode&type=date&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=kypkk/acode&type=date&legend=bottom-right" />
+ </picture>
+</a>
