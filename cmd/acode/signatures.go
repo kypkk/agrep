@@ -39,7 +39,7 @@ Three output formats are supported:
                    be additive across versions.`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return runSignatures(args[0], sigFormat, sigAll, cmd.OutOrStdout())
+		return runSignatures(args[0], sigFormat, sigAll, cmd.OutOrStdout(), cmd.ErrOrStderr())
 	},
 }
 
@@ -52,7 +52,11 @@ func init() {
 // runSignatures is the testable core of the signatures command. It is kept
 // separate from cobra wiring so tests can exercise it directly without
 // touching the global command tree or stdout.
-func runSignatures(path, formatName string, all bool, out io.Writer) error {
+//
+// stdout receives the formatted output. stderr receives diagnostic hints
+// (e.g., "everything was filtered, try --all"). Splitting the streams keeps
+// stdout clean for piping into jq or another agent.
+func runSignatures(path, formatName string, all bool, stdout, stderr io.Writer) error {
 	src, err := os.ReadFile(path)
 	if err != nil {
 		return fmt.Errorf("read %s: %w", path, err)
@@ -64,15 +68,17 @@ func runSignatures(path, formatName string, all bool, out io.Writer) error {
 
 	sigs := analyzer.ExtractSignatures(tree, src)
 	types := analyzer.ExtractTypes(tree, src)
+	totalBefore := len(sigs) + len(types)
 	if !all {
 		sigs = filterExportedSignatures(sigs)
 		types = filterExportedTypes(types)
 	}
+	totalAfter := len(sigs) + len(types)
 
 	var rendered string
 	switch formatName {
 	case "human":
-		rendered = format.Human(sigs, types, format.HumanOptions{Color: writerIsTTY(out)})
+		rendered = format.Human(sigs, types, format.HumanOptions{Color: writerIsTTY(stdout)})
 	case "agent":
 		rendered = format.Agent(sigs, types)
 	case "json":
@@ -81,16 +87,25 @@ func runSignatures(path, formatName string, all bool, out io.Writer) error {
 		return fmt.Errorf("unknown --format %q (want human, agent, or json)", formatName)
 	}
 
-	if _, err := io.WriteString(out, rendered); err != nil {
+	if _, err := io.WriteString(stdout, rendered); err != nil {
 		return err
 	}
 	// Human format omits a trailing newline so multiple invocations don't
 	// stack blank lines. Add one here so terminal prompts land on a fresh
 	// line. Agent already ends each entity in '\n' so its output is clean.
 	if rendered != "" && rendered[len(rendered)-1] != '\n' {
-		if _, err := io.WriteString(out, "\n"); err != nil {
+		if _, err := io.WriteString(stdout, "\n"); err != nil {
 			return err
 		}
+	}
+
+	// Hint: silent failure is bad UX. If the filter swallowed every entry,
+	// tell the user on stderr so they don't think acode is broken. Common
+	// trigger: package main with only lowercase decls (`func main`, helpers).
+	if !all && totalAfter == 0 && totalBefore > 0 {
+		fmt.Fprintf(stderr,
+			"acode: no exported declarations in this file (%d unexported skipped). Re-run with --all to include them.\n",
+			totalBefore)
 	}
 	return nil
 }
