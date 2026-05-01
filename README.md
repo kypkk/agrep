@@ -47,7 +47,7 @@ acode signatures <file> [--format=human|agent|json] [--all]
 ```
 
 | Flag | Default | Effect |
-|---|---|---|
+|-----|---|---|
 | `--format` | `human` | Output format. `human` is for terminals, `agent` is for piping into another agent or tool, `json` is for programmatic consumers. |
 | `--all` | `false` | Include unexported (lowercase-prefix) symbols. By default only exported names appear. Members of an *included* type (struct fields, interface methods) are always shown. |
 
@@ -158,10 +158,3 @@ everything else may shift before v1.
 
 </div>
 
----
-
-<div align="center">
-
-## License
-
-[MIT](LICENSE).
