@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"acode/internal/analyzer"
+	"github.com/kypkk/acode/internal/analyzer"
 )
 
 func TestHuman_Empty(t *testing.T) {

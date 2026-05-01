@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"acode/internal/parser"
+	"github.com/kypkk/acode/internal/parser"
 )
 
 func parseGo(t *testing.T, src string) (*parser.Tree, []byte) {

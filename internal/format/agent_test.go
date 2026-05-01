@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"acode/internal/analyzer"
+	"github.com/kypkk/acode/internal/analyzer"
 )
 
 func TestAgent_Empty(t *testing.T) {

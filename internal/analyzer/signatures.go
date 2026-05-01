@@ -6,7 +6,7 @@ import (
 
 	sitter "github.com/smacker/go-tree-sitter"
 
-	"acode/internal/parser"
+	"github.com/kypkk/acode/internal/parser"
 )
 
 // Signature describes a top-level function or method declaration.

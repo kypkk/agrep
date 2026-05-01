@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 
-	"acode/internal/analyzer"
+	"github.com/kypkk/acode/internal/analyzer"
 )
 
 // Agent renders signatures and type declarations in a dense one-line-per-entity
