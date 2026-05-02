@@ -188,6 +188,76 @@ func TestExtractSignatures_ParametersAndReturnTypes(t *testing.T) {
 	}
 }
 
+func TestExtractSignatures_KindAndReceiver(t *testing.T) {
+	cases := []struct {
+		name         string
+		src          string
+		wantKind     string
+		wantReceiver string
+		wantName     string
+	}{
+		{
+			name:         "plain function has kind func and empty receiver",
+			src:          "package x\nfunc Hello() {}\n",
+			wantKind:     "func",
+			wantReceiver: "",
+			wantName:     "Hello",
+		},
+		{
+			name:         "value receiver",
+			src:          "package x\ntype T struct{}\nfunc (t T) Foo() {}\n",
+			wantKind:     "method",
+			wantReceiver: "(t T)",
+			wantName:     "Foo",
+		},
+		{
+			name:         "pointer receiver",
+			src:          "package x\ntype T struct{}\nfunc (t *T) Foo() {}\n",
+			wantKind:     "method",
+			wantReceiver: "(t *T)",
+			wantName:     "Foo",
+		},
+		{
+			name:         "unnamed pointer receiver",
+			src:          "package x\ntype T struct{}\nfunc (*T) Foo() {}\n",
+			wantKind:     "method",
+			wantReceiver: "(*T)",
+			wantName:     "Foo",
+		},
+		{
+			name:         "generic receiver",
+			src:          "package x\ntype Box[T any] struct{}\nfunc (b *Box[T]) Get() T { var z T; return z }\n",
+			wantKind:     "method",
+			wantReceiver: "(b *Box[T])",
+			wantName:     "Get",
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tree, src := parseGo(t, tc.src)
+			sigs := ExtractSignatures(tree, src)
+			// The relevant entry is the last one — type declarations come first
+			// in source order for the method cases.
+			var got Signature
+			for _, s := range sigs {
+				if s.Name == tc.wantName {
+					got = s
+					break
+				}
+			}
+			if got.Name == "" {
+				t.Fatalf("did not find a signature named %q in: %+v", tc.wantName, sigs)
+			}
+			if got.Kind != tc.wantKind {
+				t.Errorf("Kind = %q, want %q", got.Kind, tc.wantKind)
+			}
+			if got.Receiver != tc.wantReceiver {
+				t.Errorf("Receiver = %q, want %q", got.Receiver, tc.wantReceiver)
+			}
+		})
+	}
+}
+
 func TestExtractSignatures_DocComment(t *testing.T) {
 	cases := []struct {
 		name string

@@ -50,6 +50,41 @@ func TestAgent_FunctionShapes(t *testing.T) {
 	}
 }
 
+func TestAgent_MethodLineUsesMethodKindAndReceiver(t *testing.T) {
+	sigs := []analyzer.Signature{{
+		Name: "Parse", Kind: "method", Receiver: "(g *GoParser)", Line: 23,
+		Parameters: []string{"src []byte"}, ReturnTypes: []string{"*Tree", "error"},
+	}}
+	want := "method 23 (g *GoParser) Parse(src []byte) (*Tree, error)\n"
+	if got := Agent(sigs, nil); got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
+}
+
+func TestAgent_FuncLineUnchangedWhenKindFunc(t *testing.T) {
+	// Regression guard: setting Kind="func" must not alter the existing
+	// function rendering. (Previous tests fed Kind="" which goes through the
+	// same path; this asserts the new explicit "func" value also works.)
+	sigs := []analyzer.Signature{{
+		Name: "Hello", Kind: "func", Line: 3,
+		Parameters: []string{"x int"}, ReturnTypes: []string{"error"},
+	}}
+	want := "func 3 Hello(x int) error\n"
+	if got := Agent(sigs, nil); got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
+}
+
+func TestAgent_EmptyKindDefaultsToFunc(t *testing.T) {
+	// Same defensive default as the JSON formatter: a Signature with no Kind
+	// renders as `func`, never as `method` or with an empty keyword.
+	sigs := []analyzer.Signature{{Name: "F", Line: 1}}
+	want := "func 1 F()\n"
+	if got := Agent(sigs, nil); got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
+}
+
 func TestAgent_Struct(t *testing.T) {
 	types := []analyzer.TypeDecl{{
 		Name: "Foo", Kind: "struct", Line: 5,

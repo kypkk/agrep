@@ -47,6 +47,11 @@ func Agent(sigs []analyzer.Signature, types []analyzer.TypeDecl) string {
 }
 
 func agentFunc(s analyzer.Signature) string {
+	if s.Kind == "method" {
+		return "method " + strconv.Itoa(s.Line) + " " + s.Receiver + " " + s.Name +
+			"(" + strings.Join(s.Parameters, ", ") + ")" +
+			agentReturns(s.ReturnTypes)
+	}
 	return "func " + strconv.Itoa(s.Line) + " " + s.Name +
 		"(" + strings.Join(s.Parameters, ", ") + ")" +
 		agentReturns(s.ReturnTypes)

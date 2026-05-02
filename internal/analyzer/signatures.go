@@ -41,8 +41,18 @@ func ExtractSignatures(tree *parser.Tree, src []byte) []Signature {
 			if nameNode == nil {
 				continue
 			}
+			kind := "func"
+			receiver := ""
+			if child.Type() == "method_declaration" {
+				kind = "method"
+				if rcv := child.ChildByFieldName("receiver"); rcv != nil {
+					receiver = rcv.Content(src)
+				}
+			}
 			sigs = append(sigs, Signature{
 				Name:        nameNode.Content(src),
+				Kind:        kind,
+				Receiver:    receiver,
 				Line:        int(child.StartPoint().Row) + 1,
 				Parameters:  extractParameters(child.ChildByFieldName("parameters"), src),
 				ReturnTypes: extractReturnTypes(child.ChildByFieldName("result"), src),

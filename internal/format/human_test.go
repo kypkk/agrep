@@ -50,6 +50,45 @@ func TestHuman_DocCommentRendered(t *testing.T) {
 	}
 }
 
+func TestHuman_MethodUsesMethodKeywordAndReceiver(t *testing.T) {
+	sigs := []analyzer.Signature{{
+		Name: "Parse", Kind: "method", Receiver: "(g *GoParser)", Line: 23,
+		Parameters: []string{"src []byte"}, ReturnTypes: []string{"*Tree", "error"},
+	}}
+	got := Human(sigs, nil, HumanOptions{})
+	for _, want := range []string{"method ", "(g *GoParser)", "Parse", "src []byte", "*Tree", "23"} {
+		if !strings.Contains(got, want) {
+			t.Errorf("output missing %q: %q", want, got)
+		}
+	}
+	// "method" must come first (it's the kind keyword), then the receiver,
+	// then the method name. This mirrors the agent format ordering.
+	if strings.Index(got, "method ") > strings.Index(got, "(g *GoParser)") {
+		t.Errorf("'method' keyword should appear before the receiver: %q", got)
+	}
+	if strings.Index(got, "(g *GoParser)") > strings.Index(got, "Parse") {
+		t.Errorf("receiver should appear before method name: %q", got)
+	}
+	// Methods must NOT use the `func` keyword (regression guard).
+	if strings.Contains(got, "func ") {
+		t.Errorf("method line should not contain `func `: %q", got)
+	}
+}
+
+func TestHuman_FunctionUsesFuncKeywordEvenWithEmptyKind(t *testing.T) {
+	// Manually constructed Signatures with the zero Kind value (e.g., test
+	// fixtures, future callers) render with the `func` keyword by default.
+	// This locks in the same defensive fallback the JSON formatter uses.
+	sigs := []analyzer.Signature{{Name: "F", Line: 1}} // Kind == ""
+	got := Human(sigs, nil, HumanOptions{})
+	if !strings.Contains(got, "func F(") {
+		t.Errorf("expected `func F(` in output for empty-Kind signature: %q", got)
+	}
+	if strings.Contains(got, "method ") {
+		t.Errorf("empty-Kind signature must not render as method: %q", got)
+	}
+}
+
 func TestHuman_StructFieldsRendered(t *testing.T) {
 	types := []analyzer.TypeDecl{{
 		Name: "Foo", Kind: "struct", Line: 5,

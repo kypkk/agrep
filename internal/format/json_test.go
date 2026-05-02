@@ -38,7 +38,7 @@ func TestJSON_OutputIsValidJSON(t *testing.T) {
 
 func TestJSON_Function(t *testing.T) {
 	sigs := []analyzer.Signature{{
-		Name: "Hello", Line: 3,
+		Name: "Hello", Kind: "func", Line: 3,
 		Parameters:  []string{"x int", "y string"},
 		ReturnTypes: []string{"int", "error"},
 		DocComment:  "Hello does X.\nIt returns Y.",
@@ -50,8 +50,10 @@ func TestJSON_Function(t *testing.T) {
   "functions": [
     {
       "name": "Hello",
+      "kind": "func",
       "line": 3,
       "exported": true,
+      "receiver": "",
       "parameters": [
         "x int",
         "y string"
@@ -67,6 +69,51 @@ func TestJSON_Function(t *testing.T) {
 }`
 	if got != want {
 		t.Errorf("got:\n%s\nwant:\n%s", got, want)
+	}
+}
+
+func TestJSON_Method(t *testing.T) {
+	sigs := []analyzer.Signature{{
+		Name: "Parse", Kind: "method", Receiver: "(g *GoParser)", Line: 23,
+		Parameters:  []string{"src []byte"},
+		ReturnTypes: []string{"*Tree", "error"},
+	}}
+	got := JSON("f.go", "p", sigs, nil)
+	want := `{
+  "file": "f.go",
+  "package": "p",
+  "functions": [
+    {
+      "name": "Parse",
+      "kind": "method",
+      "line": 23,
+      "exported": true,
+      "receiver": "(g *GoParser)",
+      "parameters": [
+        "src []byte"
+      ],
+      "returns": [
+        "*Tree",
+        "error"
+      ],
+      "doc": ""
+    }
+  ],
+  "types": []
+}`
+	if got != want {
+		t.Errorf("got:\n%s\nwant:\n%s", got, want)
+	}
+}
+
+func TestJSON_FunctionDefaultsKindToFuncWhenEmpty(t *testing.T) {
+	// Signatures constructed with the zero value (no Kind set) render as
+	// kind=func — keeps callers from accidentally producing JSON with an
+	// empty kind string.
+	sigs := []analyzer.Signature{{Name: "F", Line: 1}}
+	got := JSON("f.go", "p", sigs, nil)
+	if !strings.Contains(got, `"kind": "func"`) {
+		t.Errorf("expected kind=func default, got:\n%s", got)
 	}
 }
 

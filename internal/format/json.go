@@ -19,10 +19,19 @@ import (
 func JSON(file, pkg string, sigs []analyzer.Signature, types []analyzer.TypeDecl) string {
 	functions := make([]jsonFunction, 0, len(sigs))
 	for _, s := range sigs {
+		kind := s.Kind
+		if kind == "" {
+			// Defensive default: callers that construct Signatures without
+			// going through the analyzer (e.g., test fixtures) get the
+			// natural shape rather than an empty "kind" field.
+			kind = "func"
+		}
 		functions = append(functions, jsonFunction{
 			Name:       s.Name,
+			Kind:       kind,
 			Line:       s.Line,
 			Exported:   isExportedJSON(s.Name),
+			Receiver:   s.Receiver,
 			Parameters: ensureStrings(s.Parameters),
 			Returns:    ensureStrings(s.ReturnTypes),
 			Doc:        s.DocComment,
@@ -72,8 +81,10 @@ type jsonDocument struct {
 
 type jsonFunction struct {
 	Name       string   `json:"name"`
+	Kind       string   `json:"kind"`
 	Line       int      `json:"line"`
 	Exported   bool     `json:"exported"`
+	Receiver   string   `json:"receiver"`
 	Parameters []string `json:"parameters"`
 	Returns    []string `json:"returns"`
 	Doc        string   `json:"doc"`

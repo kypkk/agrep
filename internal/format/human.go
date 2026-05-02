@@ -85,7 +85,19 @@ func (p *palette) humanFunc(s analyzer.Signature) string {
 		b.WriteString(p.doc("// " + line))
 		b.WriteByte('\n')
 	}
-	b.WriteString(p.kind("func "))
+	// `method (recv) Name(...)` for methods, `func Name(...)` for plain
+	// functions. Mirrors the agent format keyword choice so consumers
+	// scanning either output use the same vocabulary. Empty Kind falls
+	// through to "func" — matches the JSON formatter's defensive default.
+	if s.Kind == "method" {
+		b.WriteString(p.kind("method "))
+		if s.Receiver != "" {
+			b.WriteString(s.Receiver)
+			b.WriteByte(' ')
+		}
+	} else {
+		b.WriteString(p.kind("func "))
+	}
 	b.WriteString(p.funcName(s.Name))
 	b.WriteByte('(')
 	b.WriteString(strings.Join(s.Parameters, ", "))

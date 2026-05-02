@@ -41,22 +41,42 @@ name ascending)`.
 
 ## Function entry
 
+A "function" entry covers both top-level functions and methods. The `kind`
+field discriminates: methods additionally populate `receiver`.
+
 ```json
 {
   "name":       "Hello",
+  "kind":       "func",
   "line":       3,
   "exported":   true,
+  "receiver":   "",
   "parameters": ["name string", "times int"],
   "returns":    ["error"],
   "doc":        "Hello greets the world."
 }
 ```
 
+```json
+{
+  "name":       "Parse",
+  "kind":       "method",
+  "line":       23,
+  "exported":   true,
+  "receiver":   "(g *GoParser)",
+  "parameters": ["src []byte"],
+  "returns":    ["*Tree", "error"],
+  "doc":        ""
+}
+```
+
 | Field | Type | Notes |
 |---|---|---|
 | `name` | string | The function or method name (no receiver). |
+| `kind` | string | `"func"` for top-level functions, `"method"` for methods. |
 | `line` | integer | 1-indexed source line where the declaration begins. |
 | `exported` | bool | `true` if the first rune of `name` is uppercase. |
+| `receiver` | string | The receiver expression as written in source, including parentheses (e.g., `"(g *GoParser)"`, `"(t T)"`, `"(*T)"`). Empty string `""` for `kind: "func"`. Always present. |
 | `parameters` | array of strings | One entry per `parameter_declaration` in source order. Multi-name shared-type declarations like `x, y int` stay as a single entry `"x, y int"` for now. Always present, may be `[]`. |
 | `returns` | array of strings | One entry per return value. A bare-type return (`func() int`) is a single-element array `["int"]`. A parenthesised list (`func() (int, error)` or `func() (x int, err error)`) is enumerated. Always present, may be `[]`. |
 | `doc` | string | Doc comment immediately above the declaration with the `//` prefix (and one optional space) stripped, lines joined by `"\n"`. Empty string if no doc comment. Block comments (`/* */`) are not extracted. |
