@@ -42,6 +42,13 @@ go install github.com/kypkk/acode/cmd/agrep@latest
 
 ## Usage
 
+agrep ships two subcommands:
+
+- [`agrep signatures`](#agrep-signatures) — read the structural surface of one file
+- [`agrep find`](#agrep-find--cross-file-structural-search) — search across files for declarations matching structural predicates
+
+### `agrep signatures`
+
 ```
 agrep signatures <file> [--format=human|agent|json] [--all]
 ```
@@ -100,6 +107,63 @@ $ agrep signatures internal/format/json.go --format=json | jq '.functions[].name
 Structured document with a stable, additive schema documented in
 [docs/json-schema.md](docs/json-schema.md). Designed for MCP servers,
 agent skills, and downstream tooling.
+
+### `agrep find` — cross-file structural search
+
+`signatures` reads one file. `find` answers questions across many — the
+ones grep can't reach because they need an AST.
+
+```
+agrep find [flags]
+```
+
+| Flag | Effect |
+|---|---|
+| `--has-method <name>` | Types with a method named X |
+| `--implements <I>` | Types whose method-name set covers an interface I (name-only, in-scope) |
+| `--returns <substr>` | Functions/methods whose return list contains the substring |
+| `--takes <substr>` | Functions/methods whose parameter list contains the substring |
+| `--has-receiver <T>` | Methods on a specific receiver type |
+| `--kind <K>` | Filter by `func`, `method`, `struct`, `interface`, `alias`, `named` |
+| `--in <path>` | Directory or file to search (default `.`) |
+| `--limit N` / `--all` | Pagination (default 20, `--all` shows everything) |
+
+Flags compose with **AND**. Output groups by *type* when the query is type-shaped
+(`--has-method`, `--implements`), flat-lists otherwise.
+
+```
+$ agrep find --has-method=Parse --in=.
+1 types with method Parse:
+
+GoParser               internal/parser/golang.go:11
+  func (g *GoParser) Parse(src []byte) (*Tree, error) :23
+
+1 results
+```
+
+```
+$ agrep find --returns=error --in=internal/finder/
+2 functions return error:
+
+internal/finder/scanner.go:20   func ScanFile(path string) (FileResult, error)
+internal/finder/walker.go:14   func Walk(root string) ([]string, error)
+
+2 results
+```
+
+When a query returns nothing, agrep proposes nearby names from the corpus:
+
+```
+$ agrep find --has-method=Bogus --in=internal/finder/
+No results.
+
+Searched 12 files in internal/finder/ for types with method "Bogus".
+
+Did you mean:
+  - method=Apply
+  - method=Suggest
+  - method=Walk
+```
 
 ## What's supported
 
