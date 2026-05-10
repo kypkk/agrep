@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kypkk/acode/internal/analyzer"
+	"github.com/kypkk/agrep/internal/analyzer"
 )
 
 func TestAgent_Empty(t *testing.T) {

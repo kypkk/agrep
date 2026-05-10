@@ -1,8 +1,8 @@
 # agrep
 
-[![CI](https://github.com/kypkk/acode/actions/workflows/ci.yml/badge.svg)](https://github.com/kypkk/acode/actions/workflows/ci.yml)
-[![Go Reference](https://pkg.go.dev/badge/github.com/kypkk/acode.svg)](https://pkg.go.dev/github.com/kypkk/acode)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/kypkk/acode)](go.mod)
+[![CI](https://github.com/kypkk/agrep/actions/workflows/ci.yml/badge.svg)](https://github.com/kypkk/agrep/actions/workflows/ci.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/kypkk/agrep.svg)](https://pkg.go.dev/github.com/kypkk/agrep)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/kypkk/agrep)](go.mod)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 > Token-efficient code recon for AI agents. A scout you run before `read`.
@@ -34,7 +34,7 @@ that actually matters.
 ## Install
 
 ```bash
-go install github.com/kypkk/acode/cmd/agrep@latest
+go install github.com/kypkk/agrep/cmd/agrep@latest
 ```
 
 > agrep uses a tree-sitter binding that requires cgo, so a working C
@@ -216,10 +216,10 @@ everything else may shift before v1.
 
 ## Star History
 
-<a href="https://www.star-history.com/?repos=kypkk%2Facode&type=date&legend=bottom-right">
+<a href="https://www.star-history.com/?repos=kypkk%2Fagrep&type=date&legend=bottom-right">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=kypkk/acode&type=date&theme=dark&legend=bottom-right" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=kypkk/acode&type=date&legend=bottom-right" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=kypkk/acode&type=date&legend=bottom-right" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=kypkk/agrep&type=date&theme=dark&legend=bottom-right" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=kypkk/agrep&type=date&legend=bottom-right" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=kypkk/agrep&type=date&legend=bottom-right" />
  </picture>
 </a>

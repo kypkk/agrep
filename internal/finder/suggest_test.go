@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kypkk/acode/internal/analyzer"
+	"github.com/kypkk/agrep/internal/analyzer"
 )
 
 func TestSuggest_HasMethod_LevenshteinAndSubstring(t *testing.T) {

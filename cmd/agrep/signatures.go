@@ -9,9 +9,9 @@ import (
 	"github.com/mattn/go-isatty"
 	"github.com/spf13/cobra"
 
-	"github.com/kypkk/acode/internal/analyzer"
-	"github.com/kypkk/acode/internal/format"
-	"github.com/kypkk/acode/internal/parser"
+	"github.com/kypkk/agrep/internal/analyzer"
+	"github.com/kypkk/agrep/internal/format"
+	"github.com/kypkk/agrep/internal/parser"
 )
 
 var (

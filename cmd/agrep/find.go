@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/kypkk/acode/internal/finder"
+	"github.com/kypkk/agrep/internal/finder"
 )
 
 // FindOptions mirrors the cobra flags so runFind can be unit-tested without

@@ -5,7 +5,7 @@ import (
 	"sort"
 	"unicode"
 
-	"github.com/kypkk/acode/internal/analyzer"
+	"github.com/kypkk/agrep/internal/analyzer"
 )
 
 // JSON renders signatures and type declarations as a stable JSON document

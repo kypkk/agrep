@@ -3,8 +3,8 @@ package format
 import (
 	"testing"
 
-	"github.com/kypkk/acode/internal/analyzer"
-	"github.com/kypkk/acode/internal/parser"
+	"github.com/kypkk/agrep/internal/analyzer"
+	"github.com/kypkk/agrep/internal/parser"
 )
 
 // TestSnapshot_Visual is a visual smoke test — runs the formatters on a

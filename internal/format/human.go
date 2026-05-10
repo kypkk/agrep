@@ -7,7 +7,7 @@ import (
 
 	"github.com/fatih/color"
 
-	"github.com/kypkk/acode/internal/analyzer"
+	"github.com/kypkk/agrep/internal/analyzer"
 )
 
 // HumanOptions configures the human-facing renderer.

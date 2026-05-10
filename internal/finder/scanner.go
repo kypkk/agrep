@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kypkk/acode/internal/analyzer"
-	"github.com/kypkk/acode/internal/parser"
+	"github.com/kypkk/agrep/internal/analyzer"
+	"github.com/kypkk/agrep/internal/parser"
 )
 
 // FileResult is the parsed-and-extracted view of one .go file.

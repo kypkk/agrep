@@ -3,7 +3,7 @@ package finder
 import (
 	"testing"
 
-	"github.com/kypkk/acode/internal/analyzer"
+	"github.com/kypkk/agrep/internal/analyzer"
 )
 
 // sigNames pulls a flat list of names out of Match results for assertions.

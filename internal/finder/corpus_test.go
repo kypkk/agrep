@@ -5,7 +5,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/kypkk/acode/internal/analyzer"
+	"github.com/kypkk/agrep/internal/analyzer"
 )
 
 func TestExtractReceiverTypeName(t *testing.T) {

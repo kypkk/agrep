@@ -3,7 +3,7 @@ package finder
 import (
 	"strings"
 
-	"github.com/kypkk/acode/internal/analyzer"
+	"github.com/kypkk/agrep/internal/analyzer"
 )
 
 // Filter holds the values of every find flag. Empty fields mean

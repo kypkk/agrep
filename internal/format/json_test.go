@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kypkk/acode/internal/analyzer"
+	"github.com/kypkk/agrep/internal/analyzer"
 )
 
 func TestJSON_EmptyShape(t *testing.T) {

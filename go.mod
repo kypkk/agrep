@@ -1,4 +1,4 @@
-module github.com/kypkk/acode
+module github.com/kypkk/agrep
 
 go 1.26.2
 

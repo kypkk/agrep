@@ -1,6 +1,6 @@
 package analyzer
 
-import "github.com/kypkk/acode/internal/parser"
+import "github.com/kypkk/agrep/internal/parser"
 
 // PackageName returns the Go package name declared at the top of the file,
 // or "" if no package_clause is present (malformed source).

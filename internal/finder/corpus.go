@@ -3,7 +3,7 @@ package finder
 import (
 	"strings"
 
-	"github.com/kypkk/acode/internal/analyzer"
+	"github.com/kypkk/agrep/internal/analyzer"
 )
 
 // Corpus aggregates FileResults and pre-computes the indexes the filter and

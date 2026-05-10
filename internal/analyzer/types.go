@@ -3,7 +3,7 @@ package analyzer
 import (
 	sitter "github.com/smacker/go-tree-sitter"
 
-	"github.com/kypkk/acode/internal/parser"
+	"github.com/kypkk/agrep/internal/parser"
 )
 
 // TypeDecl describes a top-level Go type declaration. Kind discriminates the
