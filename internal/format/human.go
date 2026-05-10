@@ -20,7 +20,11 @@ type HumanOptions struct {
 // Human renders signatures and type declarations for terminal viewing:
 // doc comments above each entity, indented bodies, and one blank line between
 // entities. The output is sorted by (Line, Name) so it tracks source order.
-func Human(sigs []analyzer.Signature, types []analyzer.TypeDecl, opts HumanOptions) string {
+//
+// When file is non-empty, the output is prefixed with two header lines —
+// `file: <path>` and `package: <name>` — separated from the body by a blank
+// line. file == "" skips the header.
+func Human(file, pkg string, sigs []analyzer.Signature, types []analyzer.TypeDecl, opts HumanOptions) string {
 	p := newPalette(opts.Color)
 	type entry struct {
 		line int
@@ -41,6 +45,16 @@ func Human(sigs []analyzer.Signature, types []analyzer.TypeDecl, opts HumanOptio
 		return entries[i].name < entries[j].name
 	})
 	var b strings.Builder
+	if file != "" {
+		b.WriteString("file: ")
+		b.WriteString(file)
+		b.WriteByte('\n')
+		b.WriteString("package: ")
+		b.WriteString(pkg)
+		if len(entries) > 0 {
+			b.WriteString("\n\n")
+		}
+	}
 	for i, e := range entries {
 		if i > 0 {
 			b.WriteString("\n\n")

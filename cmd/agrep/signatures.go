@@ -75,14 +75,15 @@ func runSignatures(path, formatName string, all bool, stdout, stderr io.Writer) 
 	}
 	totalAfter := len(sigs) + len(types)
 
+	pkg := analyzer.PackageName(tree, src)
 	var rendered string
 	switch formatName {
 	case "human":
-		rendered = format.Human(sigs, types, format.HumanOptions{Color: writerIsTTY(stdout)})
+		rendered = format.Human(path, pkg, sigs, types, format.HumanOptions{Color: writerIsTTY(stdout)})
 	case "agent":
-		rendered = format.Agent(sigs, types)
+		rendered = format.Agent(path, pkg, sigs, types)
 	case "json":
-		rendered = format.JSON(path, analyzer.PackageName(tree, src), sigs, types)
+		rendered = format.JSON(path, pkg, sigs, types)
 	default:
 		return fmt.Errorf("unknown --format %q (want human, agent, or json)", formatName)
 	}

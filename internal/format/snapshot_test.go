@@ -38,7 +38,8 @@ type Counter int
 	}
 	sigs := analyzer.ExtractSignatures(tree, src)
 	types := analyzer.ExtractTypes(tree, src)
+	pkg := analyzer.PackageName(tree, src)
 
-	t.Logf("=== AGENT ===\n%s", Agent(sigs, types))
-	t.Logf("=== HUMAN (no color) ===\n%s", Human(sigs, types, HumanOptions{Color: false}))
+	t.Logf("=== AGENT ===\n%s", Agent("demo.go", pkg, sigs, types))
+	t.Logf("=== HUMAN (no color) ===\n%s", Human("demo.go", pkg, sigs, types, HumanOptions{Color: false}))
 }

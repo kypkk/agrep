@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -28,7 +29,10 @@ func Hello(name string) error { return nil }
 	if err := runSignatures(path, "agent", false, &buf, io.Discard); err != nil {
 		t.Fatalf("runSignatures: %v", err)
 	}
-	want := "func 3 Hello(name string) error\n"
+	// The agent output is prefixed with `file:` and `package:` lines so the
+	// consumer always knows where the rest came from. The fixture path is
+	// dynamic (t.TempDir), so format the expected output with it.
+	want := fmt.Sprintf("file: %s\npackage: x\nfunc 3 Hello(name string) error\n", path)
 	if got := buf.String(); got != want {
 		t.Errorf("got %q, want %q", got, want)
 	}
@@ -210,8 +214,12 @@ func walk() {}
 	if err := runSignatures(path, "human", false, &stdout, &stderr); err != nil {
 		t.Fatal(err)
 	}
-	if strings.TrimSpace(stdout.String()) != "" {
-		t.Errorf("stdout should be empty (all decls filtered), got: %q", stdout.String())
+	// stdout still carries the file/package header; the body should be empty
+	// since every entry was filtered. We don't assert "stdout is empty" — the
+	// header is desirable. The contract this test pins is "the hint appears
+	// on stderr when the filter swallows everything".
+	if strings.Contains(stdout.String(), "func ") || strings.Contains(stdout.String(), "method ") {
+		t.Errorf("stdout body should be empty (all decls filtered), got: %q", stdout.String())
 	}
 	if !strings.Contains(stderr.String(), "--all") {
 		t.Errorf("stderr should hint about --all, got: %q", stderr.String())

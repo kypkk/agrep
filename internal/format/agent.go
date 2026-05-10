@@ -19,7 +19,12 @@ import (
 // Agent renders signatures and type declarations in a dense one-line-per-entity
 // form, sorted by (Line, Name). Each line ends in a single LF; the result has
 // no other whitespace and no ANSI codes.
-func Agent(sigs []analyzer.Signature, types []analyzer.TypeDecl) string {
+//
+// When file is non-empty, the output is prefixed with two header lines —
+// `file: <path>` and `package: <name>` — so downstream consumers always know
+// which file produced the rest. file == "" skips the header (used by tests
+// that exercise rendering in isolation).
+func Agent(file, pkg string, sigs []analyzer.Signature, types []analyzer.TypeDecl) string {
 	type entry struct {
 		line int
 		name string
@@ -39,6 +44,14 @@ func Agent(sigs []analyzer.Signature, types []analyzer.TypeDecl) string {
 		return entries[i].name < entries[j].name
 	})
 	var b strings.Builder
+	if file != "" {
+		b.WriteString("file: ")
+		b.WriteString(file)
+		b.WriteByte('\n')
+		b.WriteString("package: ")
+		b.WriteString(pkg)
+		b.WriteByte('\n')
+	}
 	for _, e := range entries {
 		b.WriteString(e.text)
 		b.WriteByte('\n')
