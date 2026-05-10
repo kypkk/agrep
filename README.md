@@ -34,7 +34,7 @@ that actually matters.
 ## Install
 
 ```bash
-go install github.com/kypkk/agrep/cmd/agrep@latest
+go install github.com/kypkk/agrep@latest
 ```
 
 > agrep uses a tree-sitter binding that requires cgo, so a working C

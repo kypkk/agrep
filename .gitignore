@@ -1,6 +1,6 @@
-# Compiled binary (module name = acode)
-/acode
-/acode.exe
+# Compiled binary (module name = agrep)
+/agrep
+/agrep.exe
 
 # Test binaries and coverage artifacts
 *.test
@@ -30,3 +30,6 @@ go.work.sum
 
 # Windows
 Thumbs.db
+
+# Docs
+docs/
