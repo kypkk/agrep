@@ -105,9 +105,12 @@ func methodSetSuperset(have []analyzer.Signature, want []string) bool {
 	return true
 }
 
-func typeHasMethod(c *Corpus, typeName, methodName string) bool {
+// typeHasMethod reports whether any method on the type has a name containing
+// the given substring. Substring (not exact) so a query like Delete matches
+// DeleteObjs / DeleteSeller — the way grep would.
+func typeHasMethod(c *Corpus, typeName, methodNameSubstr string) bool {
 	for _, m := range c.methodsByType[typeName] {
-		if m.Name == methodName {
+		if strings.Contains(m.Name, methodNameSubstr) {
 			return true
 		}
 	}
@@ -115,14 +118,14 @@ func typeHasMethod(c *Corpus, typeName, methodName string) bool {
 }
 
 // relatedMethods picks the methods of t that should display under it for
-// type-grouped output. For now: only methods matching --has-method by name.
+// type-grouped output: those whose name contains --has-method.
 func (f Filter) relatedMethods(t *analyzer.TypeDecl, c *Corpus) []analyzer.Signature {
 	if f.HasMethod == "" {
 		return nil
 	}
 	var out []analyzer.Signature
 	for _, m := range c.methodsByType[t.Name] {
-		if m.Name == f.HasMethod {
+		if strings.Contains(m.Name, f.HasMethod) {
 			out = append(out, m)
 		}
 	}
@@ -137,7 +140,9 @@ func (f Filter) matchSig(s *analyzer.Signature) bool {
 		if s.Kind != "method" {
 			return false
 		}
-		if extractReceiverTypeName(s.Receiver) != f.HasReceiver {
+		// Substring match on the extracted receiver type name, so a query like
+		// Service finds (s *minioService) / (s *sellerService) / etc.
+		if !strings.Contains(extractReceiverTypeName(s.Receiver), f.HasReceiver) {
 			return false
 		}
 	}

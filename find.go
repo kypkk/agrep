@@ -49,8 +49,8 @@ Examples:
 func init() {
 	findCmd.Flags().StringVar(&findOpts.In, "in", ".", "Directory or .go file to search")
 	findCmd.Flags().StringVar(&findOpts.Kind, "kind", "", "Filter: declaration kind (func, method, struct, interface, alias, named)")
-	findCmd.Flags().StringVar(&findOpts.HasMethod, "has-method", "", "Filter: types with a method named X")
-	findCmd.Flags().StringVar(&findOpts.HasReceiver, "has-receiver", "", "Filter: methods whose receiver type-name is X")
+	findCmd.Flags().StringVar(&findOpts.HasMethod, "has-method", "", "Filter: types with any method name containing X (substring)")
+	findCmd.Flags().StringVar(&findOpts.HasReceiver, "has-receiver", "", "Filter: methods whose receiver type-name contains X (substring)")
 	findCmd.Flags().StringVar(&findOpts.Returns, "returns", "", "Filter: substring match against return-type slice")
 	findCmd.Flags().StringVar(&findOpts.Takes, "takes", "", "Filter: substring match against parameter slice")
 	findCmd.Flags().StringVar(&findOpts.Implements, "implements", "", "Filter: types whose method-name set is a superset of interface X's")

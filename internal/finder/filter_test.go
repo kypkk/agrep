@@ -1,6 +1,7 @@
 package finder
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/kypkk/agrep/internal/analyzer"
@@ -178,6 +179,64 @@ func TestFilter_HasReceiver(t *testing.T) {
 		if !wantSet[n] {
 			t.Errorf("unexpected method %q", n)
 		}
+	}
+}
+
+func TestFilter_HasMethod_SubstringMatch(t *testing.T) {
+	// --has-method=Delete should match methods named DeleteObjs / DeleteSeller
+	// (substring), the same way grep '\.*Delete' would.
+	c := NewCorpus([]FileResult{{
+		Path: "a.go",
+		Sigs: []analyzer.Signature{
+			{Name: "DeleteObjs", Kind: "method", Receiver: "(s *minioService)", Line: 10},
+			{Name: "DeleteSeller", Kind: "method", Receiver: "(s *sellerService)", Line: 20},
+			{Name: "Upload", Kind: "method", Receiver: "(s *minioService)", Line: 30},
+			{Name: "List", Kind: "method", Receiver: "(s *otherService)", Line: 40},
+		},
+		Types: []analyzer.TypeDecl{
+			{Name: "minioService", Kind: "struct", Line: 5},
+			{Name: "sellerService", Kind: "struct", Line: 15},
+			{Name: "otherService", Kind: "struct", Line: 35},
+		},
+	}})
+	got := Filter{HasMethod: "Delete"}.Apply(c)
+	names := sigNames(got)
+	if len(names) != 2 {
+		t.Fatalf("got %d matches, want 2: %v", len(names), names)
+	}
+	seen := map[string]bool{}
+	for _, m := range got {
+		seen[m.Type.Name] = true
+	}
+	if !seen["minioService"] || !seen["sellerService"] {
+		t.Errorf("expected both minioService and sellerService, got %v", names)
+	}
+	// The displayed Methods slice under each match should be the substring-
+	// matching methods (not every method on the type).
+	for _, m := range got {
+		for _, child := range m.Methods {
+			if !strings.Contains(child.Name, "Delete") {
+				t.Errorf("type %s has non-matching method %q in Methods", m.Type.Name, child.Name)
+			}
+		}
+	}
+}
+
+func TestFilter_HasReceiver_SubstringMatch(t *testing.T) {
+	// --has-receiver=Service should match (s *minioService), (s *sellerService),
+	// (o *otherService) etc.
+	c := NewCorpus([]FileResult{{
+		Path: "a.go",
+		Sigs: []analyzer.Signature{
+			{Name: "A", Kind: "method", Receiver: "(s *minioService)", Line: 1},
+			{Name: "B", Kind: "method", Receiver: "(s *sellerService)", Line: 2},
+			{Name: "C", Kind: "method", Receiver: "(o *otherThing)", Line: 3},
+		},
+	}})
+	got := Filter{HasReceiver: "Service"}.Apply(c)
+	names := sigNames(got)
+	if len(names) != 2 {
+		t.Fatalf("got %v, want 2 substring-matching methods", names)
 	}
 }
 
