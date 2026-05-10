@@ -119,11 +119,13 @@ agrep find [flags]
 
 | Flag | Effect |
 |---|---|
-| `--has-method <substr>` | Types with any method whose name contains the substring (so `Delete` matches `DeleteObjs`, `DeleteSeller`, etc.) |
+| `--has-method <substr>` | Types with any method whose name contains the substring (so `delete` matches `Delete`, `DeleteObjs`, `softDeleteSeller`, etc.) |
 | `--implements <I>` | Types whose method-name set covers interface `I` (interface name is exact, in-scope) |
 | `--returns <substr>` | Functions/methods whose return list contains the substring |
 | `--takes <substr>` | Functions/methods whose parameter list contains the substring |
 | `--has-receiver <substr>` | Methods whose receiver type-name contains the substring |
+
+All substring matches (`--has-method`, `--has-receiver`, `--returns`, `--takes`) are **case-insensitive**. `--implements` and `--kind` are exact.
 | `--kind <K>` | Filter by `func`, `method`, `struct`, `interface`, `alias`, `named` |
 | `--in <path>` | Directory or file to search (default `.`) |
 | `--limit N` / `--all` | Pagination (default 20, `--all` shows everything) |

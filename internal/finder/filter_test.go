@@ -182,6 +182,55 @@ func TestFilter_HasReceiver(t *testing.T) {
 	}
 }
 
+func TestFilter_HasMethod_CaseInsensitive(t *testing.T) {
+	// Real-world usage: agent types `delete` (lowercase) and expects to find
+	// methods named DeleteObjs / DeleteSeller etc.
+	c := NewCorpus([]FileResult{{
+		Path: "a.go",
+		Sigs: []analyzer.Signature{
+			{Name: "DeleteObjs", Kind: "method", Receiver: "(s *minioService)", Line: 10},
+			{Name: "DeleteSeller", Kind: "method", Receiver: "(s *sellerService)", Line: 20},
+			{Name: "Upload", Kind: "method", Receiver: "(s *minioService)", Line: 30},
+		},
+		Types: []analyzer.TypeDecl{
+			{Name: "minioService", Kind: "struct", Line: 5},
+			{Name: "sellerService", Kind: "struct", Line: 15},
+		},
+	}})
+	got := Filter{HasMethod: "delete"}.Apply(c)
+	if len(sigNames(got)) != 2 {
+		t.Errorf("expected 2 matches for lowercase 'delete', got %v", sigNames(got))
+	}
+}
+
+func TestFilter_HasReceiver_CaseInsensitive(t *testing.T) {
+	c := NewCorpus([]FileResult{{
+		Path: "a.go",
+		Sigs: []analyzer.Signature{
+			{Name: "A", Kind: "method", Receiver: "(s *MinioService)", Line: 1},
+			{Name: "B", Kind: "method", Receiver: "(s *SellerService)", Line: 2},
+		},
+	}})
+	got := Filter{HasReceiver: "service"}.Apply(c)
+	if len(sigNames(got)) != 2 {
+		t.Errorf("expected 2 matches for lowercase 'service', got %v", sigNames(got))
+	}
+}
+
+func TestFilter_Returns_CaseInsensitive(t *testing.T) {
+	c := NewCorpus([]FileResult{{
+		Path: "a.go",
+		Sigs: []analyzer.Signature{
+			{Name: "A", Kind: "func", Line: 1, ReturnTypes: []string{"error"}},
+			{Name: "B", Kind: "func", Line: 2, ReturnTypes: []string{"MyError"}},
+		},
+	}})
+	got := Filter{Returns: "ERROR"}.Apply(c)
+	if len(sigNames(got)) != 2 {
+		t.Errorf("expected 2 matches for uppercase 'ERROR', got %v", sigNames(got))
+	}
+}
+
 func TestFilter_HasMethod_SubstringMatch(t *testing.T) {
 	// --has-method=Delete should match methods named DeleteObjs / DeleteSeller
 	// (substring), the same way grep '\.*Delete' would.

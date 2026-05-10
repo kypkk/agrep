@@ -106,11 +106,11 @@ func methodSetSuperset(have []analyzer.Signature, want []string) bool {
 }
 
 // typeHasMethod reports whether any method on the type has a name containing
-// the given substring. Substring (not exact) so a query like Delete matches
-// DeleteObjs / DeleteSeller — the way grep would.
+// the given substring (case-insensitive). Substring + case-insensitive so a
+// query like delete matches DeleteObjs / DeleteSeller — the way grep -i would.
 func typeHasMethod(c *Corpus, typeName, methodNameSubstr string) bool {
 	for _, m := range c.methodsByType[typeName] {
-		if strings.Contains(m.Name, methodNameSubstr) {
+		if containsFold(m.Name, methodNameSubstr) {
 			return true
 		}
 	}
@@ -118,18 +118,24 @@ func typeHasMethod(c *Corpus, typeName, methodNameSubstr string) bool {
 }
 
 // relatedMethods picks the methods of t that should display under it for
-// type-grouped output: those whose name contains --has-method.
+// type-grouped output: those whose name contains --has-method (case-insensitive).
 func (f Filter) relatedMethods(t *analyzer.TypeDecl, c *Corpus) []analyzer.Signature {
 	if f.HasMethod == "" {
 		return nil
 	}
 	var out []analyzer.Signature
 	for _, m := range c.methodsByType[t.Name] {
-		if strings.Contains(m.Name, f.HasMethod) {
+		if containsFold(m.Name, f.HasMethod) {
 			out = append(out, m)
 		}
 	}
 	return out
+}
+
+// containsFold is strings.Contains, case-insensitive. There's no
+// strings.ContainsFold in the stdlib so we lower both sides.
+func containsFold(s, substr string) bool {
+	return strings.Contains(strings.ToLower(s), strings.ToLower(substr))
 }
 
 func (f Filter) matchSig(s *analyzer.Signature) bool {
@@ -140,9 +146,9 @@ func (f Filter) matchSig(s *analyzer.Signature) bool {
 		if s.Kind != "method" {
 			return false
 		}
-		// Substring match on the extracted receiver type name, so a query like
-		// Service finds (s *minioService) / (s *sellerService) / etc.
-		if !strings.Contains(extractReceiverTypeName(s.Receiver), f.HasReceiver) {
+		// Case-insensitive substring on the extracted receiver type name, so
+		// a query like service finds (s *minioService) / (s *SellerService).
+		if !containsFold(extractReceiverTypeName(s.Receiver), f.HasReceiver) {
 			return false
 		}
 	}
@@ -159,9 +165,11 @@ func (f Filter) matchSig(s *analyzer.Signature) bool {
 	return true
 }
 
+// anyContains reports whether any item contains the needle as a
+// case-insensitive substring. Used by --returns and --takes.
 func anyContains(items []string, needle string) bool {
 	for _, s := range items {
-		if strings.Contains(s, needle) {
+		if containsFold(s, needle) {
 			return true
 		}
 	}
